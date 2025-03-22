@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import '../pages/Note.dart';
 
-class Note {
-  final String title;
-  final String content;
-
-  Note({required this.title, required this.content});
-}
-
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key, required this.notes});
 
@@ -23,6 +16,7 @@ class _MyDrawerState extends State<MyDrawer> {
     return SizedBox(
       width: 250,
       child: Drawer(
+        
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -30,9 +24,9 @@ class _MyDrawerState extends State<MyDrawer> {
               height: 100,
               child: DrawerHeader(
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 195, 212, 230),
+                  color: const Color.fromARGB(255, 196, 20, 231),
                 ),
-                child: const Text('Open Note', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28)),
+                child: const Text('OpenNote', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
               ),
             ),
             ListTile(
