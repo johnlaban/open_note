@@ -1,0 +1,7 @@
+- rename page files to end with _page
+
+- rename widgets files to end with _widget
+
+- make note page with a note ID to fetch the note from the database
+
+- make note widget with a note ID to fetch the note from the database
