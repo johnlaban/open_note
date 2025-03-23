@@ -19,6 +19,13 @@ class _NotePageState extends State<NotePage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
   void _saveNote() {
     final String title = _titleController.text;
     final String content = _contentController.text;
@@ -50,6 +57,7 @@ class _NotePageState extends State<NotePage> {
         appBar: AppBar(
           title: MyTitle(initTitle: "TEMP TITLE"),
           actions: [
+            DropdownSettingsButton(),
             IconButton(
               icon: Icon(Icons.save),
               onPressed: _saveNote, // Save note when the save button is pressed
@@ -90,13 +98,6 @@ class _NotePageState extends State<NotePage> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _contentController.dispose();
-    super.dispose();
   }
 }
 
@@ -169,5 +170,41 @@ class _MyTitleState extends State<MyTitle> {
               )
               : Text(_title, style: TextStyle(fontSize: 28)),
     ));
+  }
+}
+
+class DropdownSettingsButton extends StatefulWidget {
+  const DropdownSettingsButton({super.key});
+
+  @override
+  State<DropdownSettingsButton> createState() => _DropdownSettingsButtonState();
+}
+
+class _DropdownSettingsButtonState extends State<DropdownSettingsButton> {
+
+  late List<String> list;
+
+  @override
+  void initState() {
+    list = <String>['Rename', 'Show/Hide Toolbar'];
+    super.initState();
+  }
+
+  void _selectedHandler(String item) {
+    print(item);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.settings),
+      offset: Offset(0, 42),
+      onSelected: _selectedHandler,
+      itemBuilder: (context) => (
+          list.map<PopupMenuItem<String>>((String value) {
+            return PopupMenuItem<String>(value: value, child: Text(value));
+          }).toList()
+      )
+    );
   }
 }
