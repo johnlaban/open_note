@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/Drawer.dart';
+import '../widgets/NoteCanvas.dart';
 
 class Note {
   final String title;
@@ -70,32 +71,7 @@ class _NotePageState extends State<NotePage> {
             Note(title: 'Note 2', content: 'Content 2'),
           ],
         ),
-        body: Center(
-          child: SizedBox(
-            width: 350,
-            height: 800,
-            child: Card(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      controller: _contentController, // Attach controller
-                      decoration: InputDecoration(
-                        labelText: 'Content',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 20,
-                      keyboardType: TextInputType.multiline,
-                      enableSuggestions: true,
-                      autocorrect: false,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        body: NoteCanvas()
       ),
     );
   }
