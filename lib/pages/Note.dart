@@ -36,46 +36,55 @@ class _NotePageState extends State<NotePage> {
     }
   }
 
+  void _handleFocusManager() {
+    if (FocusManager.instance.primaryFocus != null) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: MyTitle(initTitle: "TEMP TITLE"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveNote, // Save note when the save button is pressed
-          ),
-        ],
-      ),
-      drawer: MyDrawer(
-        notes: [
-          Note(title: 'Note 1', content: 'Content 1'),
-          Note(title: 'Note 2', content: 'Content 2'),
-        ],
-      ),
-      body: Center(
-        child: SizedBox(
-          width: 350,
-          height: 800,
-          child: Card(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    controller: _contentController, // Attach controller
-                    decoration: InputDecoration(
-                      labelText: 'Content',
-                      border: OutlineInputBorder(),
+    return GestureDetector(
+      onTap: _handleFocusManager,
+      child: Scaffold(
+        appBar: AppBar(
+          title: MyTitle(initTitle: "TEMP TITLE"),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.save),
+              onPressed: _saveNote, // Save note when the save button is pressed
+            ),
+          ],
+        ),
+        drawer: MyDrawer(
+          notes: [
+            Note(title: 'Note 1', content: 'Content 1'),
+            Note(title: 'Note 2', content: 'Content 2'),
+          ],
+        ),
+        body: Center(
+          child: SizedBox(
+            width: 350,
+            height: 800,
+            child: Card(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: _contentController, // Attach controller
+                      decoration: InputDecoration(
+                        labelText: 'Content',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 20,
+                      keyboardType: TextInputType.multiline,
+                      enableSuggestions: true,
+                      autocorrect: false,
                     ),
-                    maxLines: 20,
-                    keyboardType: TextInputType.multiline,
-                    enableSuggestions: true,
-                    autocorrect: false,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -104,6 +113,7 @@ class MyTitle extends StatefulWidget {
 
 class _MyTitleState extends State<MyTitle> {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   late String _title;
   bool _isEditing = false;
@@ -114,12 +124,19 @@ class _MyTitleState extends State<MyTitle> {
     super.initState();
     _title = widget.initTitle;
     _textController.text = _title;
+
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && _isEditing) {
+        _toggleEditing();
+      }
+    });
   }
 
   @override
   void dispose() {
-    super.dispose();
     _textController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _toggleEditing() {
@@ -128,6 +145,7 @@ class _MyTitleState extends State<MyTitle> {
       if (!_isEditing) {
         if (_textController.text == "") {
           _title = _noTitleFiller;
+          _textController.text = _noTitleFiller;
         } else {
           _title = _textController.text;
         }
@@ -143,6 +161,7 @@ class _MyTitleState extends State<MyTitle> {
           _isEditing
               ? TextField(
                 controller: _textController,
+                focusNode: _focusNode,
                 autofocus: true,
                 onSubmitted: (_) => _toggleEditing(),
                 // decoration: const InputDecoration(border: InputBorder.none),
