@@ -56,7 +56,7 @@ class _NotePageState extends State<NotePage> {
       onTap: _handleFocusManager,
       child: Scaffold(
         appBar: AppBar(
-          title: MyTitle(initTitle: "TEMP TITLE"),
+          title: MyTitle(initTitle: "Untitled"),
           actions: [
             DropdownSettingsButton(),
             IconButton(
