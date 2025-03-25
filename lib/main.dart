@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'pages/Note.dart';
 import 'widgets/Drawer.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   debugRepaintRainbowEnabled = true;
   runApp(const MainApp());
 }
 
-QuillController _controller = QuillController.basic();
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -19,12 +16,6 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        FlutterQuillLocalizations.delegate,
-      ],
       title: 'OpenNote',
       home: HomePage(),
     );
@@ -49,7 +40,7 @@ class HomePage extends StatelessWidget {
         ),
         backgroundColor: Color.fromARGB(255, 196, 20, 231),
       ),
-      drawer: MyDrawer(
+      drawer: const MyDrawer(
         notes: [
           Note(title: 'Note 1', content: 'Content 1'),
           Note(title: 'Note 2', content: 'Content 2'),

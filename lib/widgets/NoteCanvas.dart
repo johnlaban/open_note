@@ -17,20 +17,7 @@ class NoteCanvasState extends State<NoteCanvas> {
   double endX = 0;
   double endY = 0;
   List<Offset> points = [];
-  List<RepaintBoundary> lines = [
-    RepaintBoundary(
-      key: Key('paint0'),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.deepOrange, width: 2),
-        ),
-        child: CustomPaint(
-          painter: Line([], 0),
-          child: SizedBox(width: 300, height: 800),
-        ),
-      ),
-    ),
-  ];
+  List<List<Offset>> lines = [];
 
   @override
   Widget build(BuildContext context) {
@@ -44,21 +31,7 @@ class NoteCanvasState extends State<NoteCanvas> {
             startX = details.localPosition.dx;
             startY = details.localPosition.dy;
             points.add(Offset(startX, startY));
-            lines.add(
-              RepaintBoundary(
-                key: Key(lines.length.toString()),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.deepOrange, width: 2),
-                  ),
-                  child: CustomPaint(
-                    key: Key("paint" + (lines.length).toString()),
-                    painter: Line(points, lines.length - 1),
-                    child: SizedBox(width: 300, height: 800),
-                  ),
-                ),
-              ),
-            );
+            lines.add([Offset(startX, startY), Offset(startX, startY)]);
           });
         },
         onPanUpdate: (details) {
@@ -66,19 +39,7 @@ class NoteCanvasState extends State<NoteCanvas> {
             endX = details.localPosition.dx;
             endY = details.localPosition.dy;
             points.add(Offset(endX, endY));
-            lines[lines.length - 1] = RepaintBoundary(
-              key: Key((lines.length - 1).toString()),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.deepOrange, width: 2),
-                ),
-                child: CustomPaint(
-                  key: Key("paint" + (lines.length - 1).toString()),
-                  painter: Line(points, lines.length - 1),
-                  child: SizedBox(width: 300, height: 800),
-                ),
-              ),
-            );
+            lines[lines.length - 1].add(Offset(endX, endY));
           });
         },
         onPanEnd: (details) {
@@ -86,38 +47,36 @@ class NoteCanvasState extends State<NoteCanvas> {
           endY = details.localPosition.dy;
           points.add(Offset(endX, endY));
           setState(() {
-            lines[lines.length - 1] = RepaintBoundary(
-              key: Key((lines.length - 1).toString()),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.deepOrange, width: 2),
-                ),
-                child: CustomPaint(
-                  key: Key("paint" + (lines.length - 1).toString()),
-                  painter: Line(points, lines.length - 1),
-                  child: SizedBox(width: 300, height: 800),
-                ),
-              ),
-            );
+            lines[lines.length - 1].add(Offset(endX, endY));
           });
           points = [];
         },
-        child: Stack(key: Key("lines"), children: lines),
+        child: Stack(
+          key: Key("lines"),
+          children: [
+            RepaintBoundary(
+              child: Container(
+                key: Key("container"),
+                color: Colors.white,
+              ),
+            ),
+            for (var i = 0; i < lines.length; i++)
+              RepaintBoundary(child: CustomPaint(key: Key(i.toString()), painter: Line(lines[i], i, lines.length - 1))),
+            // CustomPaint(key: Key((lines.length - 1).toString()), painter: Line(lines[lines.length - 1], lines.length - 1, lines.length - 1)),
+          ],
+        ),
       ),
     );
   }
 }
 
 class Line extends CustomPainter {
-  double startX = 0;
-  double startY = 0;
-  double endX = 0;
-  double endY = 0;
   List<Offset> points;
+  int currentLine;
   int index;
 
   @override
-  Line(this.points, this.index) : super();
+  Line(this.points, this.index, this.currentLine) : super();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -144,6 +103,8 @@ class Line extends CustomPainter {
     print("repaint: " + index.toString() + " " + now.toString());
     // print('---');
     // return oldDelegate.points.length != points.length;
+    print(index.toString() + " " + currentLine.toString());
+    return index == currentLine;
     return true;
   }
 }
