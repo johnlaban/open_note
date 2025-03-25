@@ -71,7 +71,7 @@ class _NotePageState extends State<NotePage> {
             Note(title: 'Note 2', content: 'Content 2'),
           ],
         ),
-        body: NoteCanvas()
+        body: RepaintBoundary(child: NoteCanvas())
       ),
     );
   }
