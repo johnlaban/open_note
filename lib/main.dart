@@ -40,7 +40,7 @@ class HomePage extends StatelessWidget {
         ),
         backgroundColor: Color.fromARGB(255, 196, 20, 231),
       ),
-      drawer: const MyDrawer(
+      drawer: MyDrawer(
         notes: [
           Note(title: 'Note 1', content: 'Content 1'),
           Note(title: 'Note 2', content: 'Content 2'),
