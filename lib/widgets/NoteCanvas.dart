@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class NoteCanvas extends StatefulWidget {
@@ -71,14 +73,7 @@ class Line extends CustomPainter {
           ..color = Colors.black
           ..strokeWidth = 4
           ..strokeCap = StrokeCap.round;
-    // canvas.drawPoints(PointMode.polygon, [Offset(x, y)], paint);
-    // setPoints(points, canvas, paint);
-    for (int i = 0; i < points.length - 1; i++) {
-      // await Future.delayed(const Duration(seconds: 2), (){});
-      canvas.drawLine(points[i], points[i + 1], paint);
-      
-    }
-    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
+    canvas.drawPoints(PointMode.points, points, paint);
     // canvas.drawVertices(Vertices(VertexMode.triangleFan, [Offset(x, y)]), BlendMode.color, paint);
   }
 
