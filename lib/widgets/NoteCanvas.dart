@@ -7,62 +7,60 @@ class NoteCanvas extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return NoteCanvasState();
+    return _NoteCanvasState();
   }
 }
 
-class NoteCanvasState extends State<NoteCanvas> {
+class _NoteCanvasState extends State<NoteCanvas> {
   double startX = 0;
   double startY = 0;
   double endX = 0;
   double endY = 0;
-  List<Offset> points = [];
   List<List<Offset>> lines = [];
+
+  void _handlePointerDown(PointerEvent details) {
+    setState(() {
+      startX = details.localPosition.dx;
+      startY = details.localPosition.dy;
+      lines.add([Offset(startX, startY), Offset(startX, startY)]);
+    });
+  }
+
+  void _handlePointerMove(PointerEvent details) {
+    setState(() {
+      endX = details.localPosition.dx;
+      endY = details.localPosition.dy;
+      lines[lines.length - 1].add(Offset(endX, endY));
+    });
+  }
+
+  void _handlePointerUp(PointerEvent details) {
+    endX = details.localPosition.dx;
+    endY = details.localPosition.dy;
+    setState(() {
+      lines[lines.length - 1].add(Offset(endX, endY));
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     print("REBUILDING");
+    print(lines.length);
     return Center(
       key: Key('canvas'),
-      child: GestureDetector(
-        key: Key('GestureDetector'),
-        onPanStart: (details) {
-          setState(() {
-            startX = details.localPosition.dx;
-            startY = details.localPosition.dy;
-            points.add(Offset(startX, startY));
-            lines.add([Offset(startX, startY), Offset(startX, startY)]);
-          });
-        },
-        onPanUpdate: (details) {
-          setState(() {
-            endX = details.localPosition.dx;
-            endY = details.localPosition.dy;
-            points.add(Offset(endX, endY));
-            lines[lines.length - 1].add(Offset(endX, endY));
-          });
-        },
-        onPanEnd: (details) {
-          endX = details.localPosition.dx;
-          endY = details.localPosition.dy;
-          points.add(Offset(endX, endY));
-          setState(() {
-            lines[lines.length - 1].add(Offset(endX, endY));
-          });
-          points = [];
-        },
+      child: Listener(
+        onPointerDown: _handlePointerDown,
+        onPointerMove: _handlePointerMove,
+        onPointerUp: _handlePointerUp,
         child: Stack(
           key: Key("lines"),
           children: [
-            RepaintBoundary(
-              child: Container(
+            Container(
                 key: Key("container"),
                 color: Colors.white,
-              ),
             ),
             for (var i = 0; i < lines.length; i++)
               RepaintBoundary(child: CustomPaint(key: Key(i.toString()), painter: Line(lines[i], i, lines.length - 1))),
-            // CustomPaint(key: Key((lines.length - 1).toString()), painter: Line(lines[lines.length - 1], lines.length - 1, lines.length - 1)),
           ],
         ),
       ),
