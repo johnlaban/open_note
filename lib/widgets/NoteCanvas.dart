@@ -12,40 +12,59 @@ class NoteCanvas extends StatefulWidget {
 }
 
 class _NoteCanvasState extends State<NoteCanvas> {
-  double startX = 0;
-  double startY = 0;
-  double endX = 0;
-  double endY = 0;
   List<List<Offset>> lines = [];
+  List<Offset> currentLine = [];
+
+  bool isDrawing = false;
+  // List<List<Offset>> lines = [];
 
   void _handlePointerDown(PointerEvent details) {
     setState(() {
-      startX = details.localPosition.dx;
-      startY = details.localPosition.dy;
-      lines.add([Offset(startX, startY), Offset(startX, startY)]);
+      var x = details.localPosition.dx;
+      var y = details.localPosition.dy;
+      currentLine.add(Offset(x, y));
+      isDrawing = true;
     });
   }
 
   void _handlePointerMove(PointerEvent details) {
     setState(() {
-      endX = details.localPosition.dx;
-      endY = details.localPosition.dy;
-      lines[lines.length - 1].add(Offset(endX, endY));
+      var x = details.localPosition.dx;
+      var y = details.localPosition.dy;
+      currentLine.add(Offset(x, y));
+      isDrawing = true;
     });
   }
 
   void _handlePointerUp(PointerEvent details) {
-    endX = details.localPosition.dx;
-    endY = details.localPosition.dy;
+    var x = details.localPosition.dx;
+    var y = details.localPosition.dy;
     setState(() {
-      lines[lines.length - 1].add(Offset(endX, endY));
+      currentLine.add(Offset(x, y));
+      lines = [...lines, [..._compressLine(currentLine)]];
+      currentLine = [];
+      isDrawing = false;
     });
+  }
+
+  List<Offset> _compressLine(List<Offset> line) {
+    List<Offset> newLine = [];
+    const inc = 8;
+    if (line.length < inc*2) {return line;}
+    for (var i = inc; i < line.length-1; i+=inc){
+      if ((line[i-inc] - line[i]).distance > 0.5) {
+        newLine.add(line[i-inc]);
+      }
+    }
+    newLine.add(line[line.length-1]);
+    return newLine;
   }
 
   @override
   Widget build(BuildContext context) {
     print("REBUILDING");
-    print(lines.length);
+    // print(lines.length);
+    // print(currentLine.length);
     return Center(
       key: Key('canvas'),
       child: Listener(
@@ -59,8 +78,12 @@ class _NoteCanvasState extends State<NoteCanvas> {
                 key: Key("container"),
                 color: Colors.white,
             ),
-            for (var i = 0; i < lines.length; i++)
-              RepaintBoundary(child: CustomPaint(key: Key(i.toString()), painter: Line(lines[i], i, lines.length - 1))),
+            // Painter for all past lines drawn
+            RepaintBoundary(child: CustomPaint(isComplex: true, painter: Line(lines, "1", isDrawing: !isDrawing))),
+            // Painter for only the current line 
+            RepaintBoundary(child: CustomPaint(isComplex: true, painter: Line([currentLine], "2"))),
+            // for (var i = 0; i < lines.length; i++)
+            //   RepaintBoundary(child: CustomPaint(key: Key(i.toString()), painter: Line(lines[i], i, lines.length - 1))),
           ],
         ),
       ),
@@ -69,12 +92,12 @@ class _NoteCanvasState extends State<NoteCanvas> {
 }
 
 class Line extends CustomPainter {
-  List<Offset> points;
-  int currentLine;
-  int index;
+  List<List<Offset>> points;
+  bool isDrawing;
+  String key;
 
   @override
-  Line(this.points, this.index, this.currentLine) : super();
+  Line(this.points, this.key, {this.isDrawing = true}) : super();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -86,9 +109,14 @@ class Line extends CustomPainter {
     // for (var i = 0; i < points.length - 1; i++) {
     //   canvas.drawLine(points[i], points[i + 1], paint);
     // }
-    var now = new DateTime.now();
-    print("paint: " + index.toString() + " " + now.toString());
-    canvas.drawPoints(PointMode.lines, points, paint);
+    // var now = new DateTime.now();
+    for (final line in points){
+      for (var i = 1; i < line.length; i++) {
+        canvas.drawLine(line[i-1], line[i], paint);
+      }
+      // canvas.drawPoints(PointMode.lines, line, paint);
+    }
+    // canvas.drawPoints(PointMode.points, points, paint);
     // canvas.drawLine(PointMode.points, points, paint);
     // canvas.drawVertices(Vertices(VertexMode.triangleFan, [Offset(x, y)]), BlendMode.color, paint);
   }
@@ -98,11 +126,12 @@ class Line extends CustomPainter {
     // print(oldDelegate.points.length.toString() + '---');
     // print(points.length);
     var now = new DateTime.now();
-    print("repaint: " + index.toString() + " " + now.toString());
-    // print('---');
-    // return oldDelegate.points.length != points.length;
-    print(index.toString() + " " + currentLine.toString());
-    return index == currentLine;
-    return true;
+    // print("repaint: " + index.toString() + " " + now.toString());
+    // // print('---');
+    // // return oldDelegate.points.length != points.length;
+    // print(index.toString() + " " + currentLine.toString());
+    // return index == currentLine;
+    print(key + " " + isDrawing.toString() + " " + now.toString());
+    return isDrawing;
   }
 }
